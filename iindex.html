@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Espanhol Pro">
+    <title>Espanhol Pro - Domine a Pronúncia</title>
+    <style>
+        /* CSS RESET & VARIAVEIS DE CORES DARK */
+        :root {
+            --bg-page: #050507; 
+            --app-bg: #121216; 
+            --frame-border: #2a2a30; 
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #ffffff;
+            --text-secondary: #9aa0a6;
+            --accent-blue: #00e5ff; 
+            --accent-hover: #00b8d4;
+            --success-green: #2ecc71;
+            --error-red: #e74c3c;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            background-color: var(--app-bg);
+            width: 100%;
+            max-width: 420px; 
+            height: 100%;
+            max-height: 850px; 
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        header {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.01);
+        }
+
+        header h1 { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--text-primary); }
+        header p { font-size: 11px; color: var(--accent-blue); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+
+        .quadro-wrapper {
+            padding: 20px 20px 0 20px;
+        }
+
+        .quadro-imagem {
+            width: 100%;
+            height: 190px; 
+            border-radius: 16px; 
+            border: 6px solid var(--frame-border); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,0,0,0.3);
+            background-color: #2a2a30; 
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.8s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag-local {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.15);
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .display-frase {
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 25px;
+            text-align: center;
+        }
+
+        .frase-alvo { font-size: 26px; font-weight: 800; line-height: 1.3; color: var(--text-primary); margin-bottom: 8px; word-wrap: break-word; }
+        .traducao { font-size: 16px; color: var(--accent-blue); font-style: italic; font-weight: 500; margin-bottom: 20px; opacity: 0.9; }
+        
+        .feedback-area {
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .resultado { font-size: 22px; font-weight: 700; }
+        .correto { color: var(--success-green); }
+        .errado { color: var(--error-red); text-decoration: underline; text-underline-offset: 4px; }
+        .status-msg { font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-top: 8px;}
+
+        .controles-container {
+            padding: 10px 20px 20px 20px;
+        }
+
+        .controles-voz { display: flex; justify-content: center; gap: 12px; }
+
+        .btn-action {
+            flex: 1;
+            border: none;
+            padding: 14px 0;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+        }
+
+        .btn-ouvir { background-color: rgba(255,255,255,0.06); border: 1px solid var(--border-color); color: var(--text-primary); }
+        .btn-ouvir:hover { background-color: rgba(255,255,255,0.1); }
+
+        .btn-gravar { background-color: var(--accent-blue); box-shadow: 0 4px 15px rgba(0,229,255,0.25); color: #000; }
+        .btn-gravar:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
+        .btn-gravar.gravando { animation: pulsarRed 1.5s infinite; background-color: var(--error-red); color: #fff; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4); }
+
+        @keyframes pulsarRed {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.03); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .painel-rodape {
+            background: rgba(0,0,0,0.4);
+            border-top: 1px solid var(--border-color);
+            padding: 15px;
+        }
+
+        .titulo-licoes { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; font-weight: bold; padding-left: 5px;}
+
+        .painel-botoes {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 8px;
+            max-height: 130px; 
+            overflow-y: auto;
+            padding-right: 5px; 
+        }
+        
+        .painel-botoes::-webkit-scrollbar { width: 4px; }
+        .painel-botoes::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+        .botao-numero {
+            background-color: rgba(255,255,255,0.04);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .botao-numero:hover { background-color: rgba(255,255,255,0.1); color: var(--text-primary); }
+        .botao-numero.ativo { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(0,229,255,0.08); }
+        .botao-numero.concluido { background-color: var(--success-green); color: #fff; border-color: transparent; }
+
+        @media (min-height: 850px) {
+            .app-container { height: 95vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <header>
+            <h1>Espanhol Pro</h1>
+            <p>Habla con claridad, viaja por el mundo</p>
+        </header>
+
+        <div class="quadro-wrapper">
+            <div class="quadro-imagem" id="quadroImagem">
+                <div id="tagLocal" class="tag-local">📍 Cargando...</div>
+            </div>
+        </div>
+
+        <div class="display-frase">
+            <div class="frase-alvo" id="fraseAlvo">...</div>
+            <div class="traducao" id="traducaoPt">...</div>
+            
+            <div class="feedback-area">
+                <div class="resultado" id="resultadoTela"></div>
+                <div class="status-msg" id="status">Seleccione una lección abajo.</div>
+            </div>
+        </div>
+
+        <div class="controles-container">
+            <div class="controles-voz">
+                <button class="btn-action btn-ouvir" id="btnOuvir">
+                    <i>🔊</i> Ouvir
+                </button>
+                <button class="btn-action btn-gravar" id="btnGravar">
+                    <i id="mic-icon">🎤</i> <span id="lbl-gravar">Falar</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="painel-rodape">
+            <div class="titulo-licoes">Módulos de Estudo</div>
+            <div class="painel-botoes" id="painelBotoes"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const imagensDeFundo = [
+            { url: 'https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=800&q=80', nome: 'Torre Eiffel, París' },
+            { url: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=80', nome: 'Nueva York, EE. UU.' },
+            { url: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=800&q=80', nome: 'Tokio, Japón' },
+            { url: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80', nome: 'Coliseo, Roma' },
+            { url: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80', nome: 'Londres, Inglaterra' },
+            { url: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=800&q=80', nome: 'Río de Janeiro, Brasil' },
+            { url: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80', nome: 'Ópera de Sídney' },
+            { url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80', nome: 'Kioto, Japón' },
+            { url: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80', nome: 'Taj Mahal, India' },
+            { url: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80', nome: 'Dubái, EAU' },
+            { url: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80', nome: 'Santorini, Grecia' },
+            { url: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=800&q=80', nome: 'Venecia, Italia' },
+            { url: 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?auto=format&fit=crop&w=800&q=80', nome: 'Machu Picchu, Perú' },
+            { url: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=800&q=80', nome: 'Muralla China' },
+            { url: 'https://images.unsplash.com/photo-1539667468225-eebb663053e6?auto=format&fit=crop&w=800&q=80', nome: 'Pirámides de Guiza' },
+            { url: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=800&q=80', nome: 'Golden Gate, EE. UU.' },
+            { url: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80', nome: 'Ruta 66, EE. UU.' },
+            { url: 'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?auto=format&fit=crop&w=800&q=80', nome: 'Hollywood, EE. UU.' },
+            { url: 'https://images.unsplash.com/photo-1552035489-3974ee0f04eb?auto=format&fit=crop&w=800&q=80', nome: 'Ámsterdam, Holanda' },
+            { url: 'https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?auto=format&fit=crop&w=800&q=80', nome: 'Estambul, Turquía' },
+            { url: 'https://images.unsplash.com/photo-1526649661456-89c7ed4d00b8?auto=format&fit=crop&w=800&q=80', nome: 'Singapur' },
+            { url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80', nome: 'Hong Kong' },
+            { url: 'https://images.unsplash.com/photo-1560930950-5ce20d36906f?auto=format&fit=crop&w=800&q=80', nome: 'Berlín, Alemania' },
+            { url: 'https://images.unsplash.com/photo-1583422409516-15ec0a05c317?auto=format&fit=crop&w=800&q=80', nome: 'Barcelona, España' },
+            { url: 'https://images.unsplash.com/photo-1551000673-f9c3c8d3da16?auto=format&fit=crop&w=800&q=80', nome: 'Atenas, Grecia' },
+            { url: 'https://images.unsplash.com/photo-1531366936337-7785a8208447?auto=format&fit=crop&w=800&q=80', nome: 'Aurora Boreal' },
+            { url: 'https://images.unsplash.com/photo-1474015977092-28f09d846b41?auto=format&fit=crop&w=800&q=80', nome: 'Gran Cañón, EE. UU.' },
+            { url: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=80', nome: 'Alpes Suizos' },
+            { url: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800&q=80', nome: 'Islas Maldivas' },
+            { url: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=800&q=80', nome: 'Banff, Canadá' },
+            { url: 'https://images.unsplash.com/photo-1579737190987-25e4fbaaa44d?auto=format&fit=crop&w=800&q=80', nome: 'Patagonia, Argentina' },
+            { url: 'https://images.unsplash.com/photo-1454692173233-f4f34c12adad?auto=format&fit=crop&w=800&q=80', nome: 'Desierto del Sahara' },
+            { url: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=800&q=80', nome: 'Cascadas, Islandia' },
+            { url: 'https://images.unsplash.com/photo-1490682143684-14369e18dce8?auto=format&fit=crop&w=800&q=80', nome: 'Monte Fuji, Japón' },
+            { url: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=800&q=80', nome: 'Yellowstone, EE. UU.' },
+            { url: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=800&q=80', nome: 'Safari, Kenia' },
+            { url: 'https://images.unsplash.com/photo-1553531384-cc64ac80f931?auto=format&fit=crop&w=800&q=80', nome: 'Monte Everest' },
+            { url: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?auto=format&fit=crop&w=800&q=80', nome: 'Cataratas del Iguazú' },
+            { url: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=800&q=80', nome: 'Selva Amazónica' },
+            { url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80', nome: 'Playa del Caribe' },
+            { url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80', nome: 'Fiordos, Noruega' },
+            { url: 'https://images.unsplash.com/photo-1438786657495-640937046d18?auto=format&fit=crop&w=800&q=80', nome: 'Salar de Uyuni' },
+            { url: 'https://images.unsplash.com/photo-1502021680123-db54070a72fb?auto=format&fit=crop&w=800&q=80', nome: 'Capadocia, Turquía' },
+            { url: 'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=800&q=80', nome: 'Cordillera de los Andes' },
+            { url: 'https://images.unsplash.com/photo-1498307833015-e7b400441eb8?auto=format&fit=crop&w=800&q=80', nome: 'Islas Galápagos' },
+            { url: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=800&q=80', nome: 'Bahía de Ha Long' },
+            { url: 'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=800&q=80', nome: 'Selva Negra, Alemania' },
+            { url: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80', nome: 'Kilimanjaro, Tanzania' },
+            { url: 'https://images.unsplash.com/photo-1541427573-0305886e0044?auto=format&fit=crop&w=800&q=80', nome: 'Yosemite, EE. UU.' },
+            { url: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=800&q=80', nome: 'Playa, Maldivas' }
+        ];
+
+        const listaDeFrases = [
+            { es: "Hola.", pt: "Olá." },
+            { es: "Buenos días.", pt: "Bom dia." },
+            { es: "Buenas noches.", pt: "Boa noite." },
+            { es: "Por favor.", pt: "Por favor." },
+            { es: "Gracias.", pt: "Obrigado(a)." },
+            { es: "De nada.", pt: "De nada." },
+            { es: "Sí.", pt: "Sim." },
+            { es: "No.", pt: "Não." },
+            { es: "Con permiso.", pt: "Com licença / Desculpe." },
+            { es: "Lo siento.", pt: "Me desculpe." },
+            { es: "¿Hablas inglés?", pt: "Você fala inglês?" },
+            { es: "Hablo un poco.", pt: "Eu falo um pouco." },
+            { es: "No entiendo.", pt: "Eu não entendo." },
+            { es: "¿Podrías repetir?", pt: "Poderia repetir?" },
+            { es: "Habla despacio.", pt: "Fale devagar." },
+            { es: "¿Cuál es tu nombre?", pt: "Qual é o seu nome?" },
+            { es: "Mi nombre es John.", pt: "Meu nome é John." },
+            { es: "Mucho gusto.", pt: "Prazer em conhecer você." },
+            { es: "¿Cómo estás?", pt: "Como vai você?" },
+            { es: "Estoy bien.", pt: "Eu estou bem." },
+            { es: "¿De dónde eres?", pt: "De onde você é?" },
+            { es: "Soy de Brasil.", pt: "Eu sou do Brasil." },
+            { es: "¿Cuántos años tienes?", pt: "Quantos anos você tem?" },
+            { es: "Estoy feliz.", pt: "Estou feliz." },
+            { es: "Estoy cansado.", pt: "Estou cansado(a)." },
+            { es: "Tengo hambre.", pt: "Estou com fome." },
+            { es: "Tengo sed.", pt: "Estou com sede." },
+            { es: "Necesito ayuda.", pt: "Preciso de ajuda." },
+            { es: "¿Dónde está el baño?", pt: "Onde fica o banheiro?" },
+            { es: "¿Cuánto cuesta?", pt: "Quanto custa?" },
+            { es: "Es caro.", pt: "É caro." },
+            { es: "Es barato.", pt: "É barato." },
+            { es: "Quiero comprar esto.", pt: "Quero comprar isso." },
+            { es: "¿Aceptan tarjetas?", pt: "Vocês aceitam cartão?" },
+            { es: "¿Dónde está el banco?", pt: "Onde fica o banco?" },
+            { es: "¿Dónde está el hospital?", pt: "Onde fica o hospital?" },
+            { es: "Llame a una ambulancia.", pt: "Chame uma ambulância." },
+            { es: "Llame a la policía.", pt: "Chame a polícia." },
+            { es: "Perdí mi pasaporte.", pt: "Perdi meu passaporte." },
+            { es: "Perdí mi bolso.", pt: "Perdi minha bolsa." },
+            { es: "¿Dónde está el aeropuerto?", pt: "Onde fica o aeroporto?" },
+            { es: "Necesito un taxi.", pt: "Preciso de um táxi." },
+            { es: "Gire a la izquierda.", pt: "Vire à esquerda." },
+            { es: "Gire a la derecha.", pt: "Vire à direita." },
+            { es: "Siga derecho.", pt: "Siga direto." },
+            { es: "Pare aquí.", pt: "Pare aqui." },
+            { es: "¿Qué hora es?", pt: "Que horas são?" },
+            { es: "Es temprano.", pt: "É cedo." },
+            { es: "Es tarde.", pt: "É tarde." },
+            { es: "Hoy es lunes.", pt: "Hoje é segunda-feira." },
+            { es: "Mañana es martes.", pt: "Amanhã é terça-feira." },
+            { es: "Ayer fue domingo.", pt: "Ontem foi domingo." },
+            { es: "Me encanta viajar.", pt: "Amo viajar." },
+            { es: "Quiero comer.", pt: "Quero comer." },
+            { es: "La comida es buena.", pt: "A comida está boa." },
+            { es: "La cuenta, por favor.", pt: "A conta, por favor." },
+            { es: "Agua, por favor.", pt: "Água, por favor." },
+            { es: "Quiero café.", pt: "Quero café." },
+            { es: "Sin azúcar.", pt: "Sem açúcar." },
+            { es: "Soy alérgico.", pt: "Sou alérgico(a)." },
+            { es: "Mesa para dos.", pt: "Mesa para dois." },
+            { es: "El menú, por favor.", pt: "O cardápio, por favor." },
+            { es: "Delicioso.", pt: "Delicioso." },
+            { es: "Estoy satisfecho.", pt: "Estou satisfeito(a)." },
+            { es: "¿Dónde está el hotel?", pt: "Onde fica o hotel?" },
+            { es: "Tengo una reserva.", pt: "Tenho uma reserva." },
+            { es: "La llave de la habitación.", pt: "Chave do quarto, por favor." },
+            { es: "¿Hay wifi?", pt: "Tem Wi-Fi?" },
+            { es: "¿Cuál es la contraseña?", pt: "Qual a senha?" },
+            { es: "Mi habitación está fría.", pt: "Meu quarto está frio." },
+            { es: "Limpie la habitación.", pt: "Limpe o quarto." },
+            { es: "Despiértame.", pt: "Me acorde." },
+            { es: "¿Dónde está la playa?", pt: "Onde fica a praia?" },
+            { es: "Está soleado.", pt: "Está ensolarado." },
+            { es: "Está lloviendo.", pt: "Está chovendo." },
+            { es: "Hace calor.", pt: "Está quente." },
+            { es: "Hace frío.", pt: "Está frio." },
+            { es: "Hermoso día.", pt: "Lindo dia." },
+            { es: "Me gusta este lugar.", pt: "Gosto deste lugar." },
+            { es: "Toma una foto.", pt: "Tire uma foto." },
+            { es: "Sonríe.", pt: "Sorria." },
+            { es: "Estoy perdido.", pt: "Estou perdido(a)." },
+            { es: "Ayúdame a encontrar.", pt: "Me ajude a encontrar." },
+            { es: "¿Está lejos?", pt: "É longe?" },
+            { es: "¿Está cerca?", pt: "É perto?" },
+            { es: "Camina una cuadra.", pt: "Ande um quarteirão." },
+            { es: "Estoy listo.", pt: "Estou pronto(a)." },
+            { es: "Vamos.", pt: "Vamos lá." },
+            { es: "Espera un minuto.", pt: "Espere um minuto." },
+            { es: "Date prisa.", pt: "Apresse-se." },
+            { es: "Tómate tu tiempo.", pt: "Leve o tempo que precisar." },
+            { es: "¿Qué es esto?", pt: "O que é isso?" },
+            { es: "¿Quién es ese?", pt: "Quem é aquele(a)?" },
+            { es: "¿Por qué no?", pt: "Por que não?" },
+            { es: "¿Cómo así?", pt: "Como assim?" },
+            { es: "Creo que sí.", pt: "Eu acho que sim." },
+            { es: "Creo que no.", pt: "Eu acho que não." },
+            { es: "Tal vez.", pt: "Talvez." },
+            { es: "Por supuesto.", pt: "Claro." },
+            { es: "Absolutamente.", pt: "Com certeza." },
+            { es: "Estoy de acuerdo.", pt: "Eu concordo." },
+            { es: "No estoy de acuerdo.", pt: "Eu discordo." },
+            { es: "Lo sé.", pt: "Eu sei." },
+            { es: "No lo sé.", pt: "Eu não sei." },
+            { es: "Entiendo.", pt: "Eu entendo." },
+            { es: "Olvídalo.", pt: "Esqueça." },
+            { es: "No hay problema.", pt: "Sem problema." },
+            { es: "Buena suerte.", pt: "Boa sorte." },
+            { es: "Felicidades.", pt: "Parabéns." },
+            { es: "Feliz cumpleaños.", pt: "Feliz aniversário." },
+            { es: "Feliz Navidad.", pt: "Feliz Natal." },
+            { es: "Feliz Año Nuevo.", pt: "Feliz Ano Novo." },
+            { es: "Qué pena.", pt: "Que pena." },
+            { es: "Cuidado.", pt: "Cuidado." },
+            { es: "Ten cuidado.", pt: "Tenha cuidado." },
+            { es: "Mira aquí.", pt: "Olhe aqui." },
+            { es: "Escúchame.", pt: "Escute-me." },
+            { es: "Ven aquí.", pt: "Venha aqui." },
+            { es: "Vete.", pt: "Vá embora." },
+            { es: "Siéntate.", pt: "Sente-se." },
+            { es: "Levántate.", pt: "Levante-se." },
+            { es: "Abre la puerta.", pt: "Abra a porta." },
+            { es: "Cierra la ventana.", pt: "Feche a janela." },
+            { es: "Enciende la luz.", pt: "Ligue a luz." },
+            { es: "Apaga la televisión.", pt: "Desligue a TV." },
+            { es: "Lávate las manos.", pt: "Lave suas mãos." },
+            { es: "Toma una ducha.", pt: "Tome um banho." },
+            { es: "Cepíllate los dientes.", pt: "Escove os dentes." },
+            { es: "Ve a dormir.", pt: "Vá dormir." },
+            { es: "Despierta.", pt: "Acorde." },
+            { es: "Desayuna.", pt: "Tome café da manhã." },
+            { es: "Come tu almuerzo.", pt: "Coma seu almoço." },
+            { es: "La cena está lista.", pt: "O jantar está pronto." },
+            { es: "Me gustan las manzanas.", pt: "Eu gosto de maçãs." },
+            { es: "Odio las cebollas.", pt: "Eu odeio cebolas." },
+            { es: "Esto es dulce.", pt: "Isso é doce." },
+            { es: "Esto es salado.", pt: "Isso é salgado." },
+            { es: "Necesito dinero.", pt: "Preciso de dinheiro." },
+            { es: "No tengo dinero.", pt: "Não tenho dinheiro." },
+            { es: "¿Dónde hay un cajero?", pt: "Onde tem um caixa eletrônico?" },
+            { es: "¿Puedo pedir prestado?", pt: "Posso pegar emprestado?" },
+            { es: "Te lo devolveré.", pt: "Eu pagarei de volta." },
+            { es: "Trabajo aquí.", pt: "Eu trabalho aqui." },
+            { es: "Soy estudiante.", pt: "Sou estudiante." },
+            { es: "Amo mi trabajo.", pt: "Amo meu trabalho." },
+            { es: "Estoy ocupado.", pt: "Estou ocupado(a)." },
+            { es: "Llámame más tarde.", pt: "Me ligue mais tarde." },
+            { es: "Envía un correo.", pt: "Envie um e-mail." },
+            { es: "¿Cuál es tu número?", pt: "Qual o seu número?" },
+            { es: "Mi teléfono está descargado.", pt: "Meu celular descarregou." },
+            { es: "Necesito un cargador.", pt: "Preciso de um carregador." },
+            { es: "Veamos una película.", pt: "Vamos ver um filme." },
+            { es: "Me gusta la música.", pt: "Gosto de música." },
+            { es: "Juego al fútbol.", pt: "Eu jogo futebol." },
+            { es: "Él es mi amigo.", pt: "Ele é meu amigo." },
+            { es: "Ella es mi hermana.", pt: "Ela é minha irmã." },
+            { es: "Ellos están aquí.", pt: "Eles estão aqui." },
+            { es: "Somos familia.", pt: "Nós somos família." },
+            { es: "¿Tienes hijos?", pt: "Você tem filhos?" },
+            { es: "Soy soltero.", pt: "Sou solteiro(a)." },
+            { es: "Estoy casado.", pt: "Sou casado(a)." },
+            { es: "Tengo un perro.", pt: "Tenho um cachorro." },
+            { es: "Tengo un gato.", pt: "Tenho um gato." },
+            { es: "Es una casa hermosa.", pt: "É uma casa linda." },
+            { es: "Este es mi auto.", pt: "Este é meu carro." },
+            { es: "Conduce con cuidado.", pt: "Dirija com segurança." },
+            { es: "El tráfico es malo.", pt: "O trânsito está ruim." },
+            { es: "Estoy manejando.", pt: "Estou dirigindo." },
+            { es: "Estaciona aquí.", pt: "Estacione aqui." },
+            { es: "Necesito gasolina.", pt: "Preciso de gasolina." },
+            { es: "¿Puedes arreglarlo?", pt: "Você pode consertar?" },
+            { es: "Está roto.", pt: "Está quebrado." },
+            { es: "Me siento enfermo.", pt: "Me sinto doente." },
+            { es: "Me duele la cabeza.", pt: "Minha cabeça dói." },
+            { es: "Necesito un médico.", pt: "Preciso de um médico." },
+            { es: "Tengo fiebre.", pt: "Estou com febre." },
+            { es: "Toma esta medicina.", pt: "Tome este remédio." },
+            { es: "Bebe agua.", pt: "Beba água." },
+            { es: "Descansa bien.", pt: "Descanse bem." },
+            { es: "Me siento mejor.", pt: "Me sinto melhor." },
+            { es: "Es un secreto.", pt: "É um segredo." },
+            { es: "No se lo digas a nadie.", pt: "Não conte." },
+            { es: "Lo prometo.", pt: "Eu prometo." },
+            { es: "Estoy bromeando.", pt: "Estou brincando." },
+            { es: "¿Hablas en serio?", pt: "Você está falando sério?" },
+            { es: "Estoy seguro.", pt: "Tenho certeza." },
+            { es: "Lo dudo.", pt: "Eu duvido." },
+            { es: "En mi opinión.", pt: "Na minha opinião." },
+            { es: "Prefiero el té.", pt: "Prefiro chá." },
+            { es: "Me gustan ambos.", pt: "Gosto de ambos." },
+            { es: "Ninguno de ellos.", pt: "Nenhum deles." },
+            { es: "Todo está bien.", pt: "Tudo está bem." },
+            { es: "Nada que hacer.", pt: "Nada a fazer." },
+            { es: "Algo anda mal.", pt: "Algo está errado." },
+            { es: "En cualquier momento.", pt: "A qualquer hora." },
+            { es: "En cualquier lugar.", pt: "Em cualquier lugar." },
+            { es: "Que alguien ayude.", pt: "Alguém ajude." },
+            { es: "No hay nadie aquí.", pt: "Ninguém está aqui." },
+            { es: "Sonríe siempre.", pt: "Sempre sorria." },
+            { es: "Nunca digas nunca.", pt: "Nunca diga nunca." },
+            { es: "A veces lloro.", pt: "Às vezes eu choro." },
+            { es: "Normalmente leo.", pt: "Geralmente eu leio." },
+            { es: "Rara vez bebo.", pt: "Raramente eu bebo." },
+            { es: "Casi llego.", pt: "Estou quase lá." },
+            { es: "Un momento.", pt: "Só um momento." },
+            { es: "Ahora mismo.", pt: "Agora mesmo." },
+            { es: "Más tarde hoy.", pt: "Mais tarde hoje." },
+            { es: "Tarde o temprano.", pt: "Mais cedo ou mais tarde." },
+            { es: "Antes que nada.", pt: "Primeiro de tudo." },
+            { es: "En conclusión.", pt: "Em conclusão." },
+            { es: "Por otro lado.", pt: "Por outro lado." },
+            { es: "Por cierto.", pt: "A propósito." },
+            { es: "Por ejemplo.", pt: "Por exemplo." },
+            { es: "Tal como.", pt: "Tal como." },
+            { es: "Según.", pt: "De acordo com." },
+            { es: "En lugar de.", pt: "Ao invés de." },
+            { es: "Por tu culpa.", pt: "Por causa de você." },
+            { es: "Gracias a ti.", pt: "Graças a você." },
+            { es: "Debido a la lluvia.", pt: "Devido à chuva." },
+            { es: "A pesar de.", pt: "Apesar de." },
+            { es: "Aunque.", pt: "Mesmo que." },
+            { es: "Aunque llovió.", pt: "Embora tenha chovido." },
+            { es: "Lo antes posible.", pt: "O mais rápido possível." },
+            { es: "Siempre y cuando.", pt: "Contanto que." },
+            { es: "Hasta ahora todo bien.", pt: "Até agora tudo bem." },
+            { es: "Tengo que irme.", pt: "Eu tenho que ir." },
+            { es: "Déjame ver.", pt: "Deixe-me ver." },
+            { es: "Déjame pensar.", pt: "Deixe-me pensar." },
+            { es: "Dame eso.", pt: "Me dê isso." },
+            { es: "Enséñame cómo.", pt: "Me mostre como." },
+            { es: "Dime por qué.", pt: "Me diga por quê." },
+            { es: "Pregúntale a él.", pt: "Pergunte a ele." },
+            { es: "Contesta el teléfono.", pt: "Atenda o telefone." },
+            { es: "Lee el libro.", pt: "Leia o livro." },
+            { es: "Escribe una carta.", pt: "Escreva uma carta." },
+            { es: "Aprende español.", pt: "Aprenda espanhol." },
+            { es: "Practica todos los días.", pt: "Pratique todos os dias." },
+            { es: "No te rindas.", pt: "Não desista." },
+            { es: "Tú puedes hacerlo.", pt: "Você consegue." },
+            { es: "Cree en ti mismo.", pt: "Acredite em si mesmo." },
+            { es: "Sueña en grande.", pt: "Sonhe grande." },
+            { es: "Trabaja duro.", pt: "Trabalhe duro." },
+            { es: "Disfruta la vida.", pt: "Aproveite a vida." }
+        ];
+
+        const dom = {
+            quadro: document.getElementById('quadroImagem'), 
+            painel: document.getElementById('painelBotoes'),
+            frase: document.getElementById('fraseAlvo'),
+            pt: document.getElementById('traducaoPt'),
+            btnGravar: document.getElementById('btnGravar'),
+            lblGravar: document.getElementById('lbl-gravar'),
+            btnOuvir: document.getElementById('btnOuvir'),
+            status: document.getElementById('status'),
+            resultado: document.getElementById('resultadoTela'),
+            tagLocal: document.getElementById('tagLocal')
+        };
+
+        let indiceAtual = 0;
+        let fraseAtualEspanhol = ""; 
+        let isRecording = false; // Novo controle anti-travamento
+        let progressoSalvo = JSON.parse(localStorage.getItem('progressoEspanholPro')) || [];
+
+        // --- MOTOR DE ÁUDIO NATIVO (PARA OS SONS DE JOGO) ---
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Som de Moeda/Estrela (Acertou)
+        function tocarSomAcerto() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); 
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch(e) {}
+        }
+
+        // Som de Buzzer (Errou)
+        function tocarSomErro() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch(e) {}
+        }
+
+        // --- SISTEMA DE VOZ DO ROBÔ ---
+        dom.btnOuvir.addEventListener('click', () => {
+            initAudio(); 
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                const robo = new SpeechSynthesisUtterance(fraseAtualEspanhol);
+                robo.lang = 'es-ES'; 
+                robo.rate = 0.85; 
+                window.speechSynthesis.speak(robo);
+            }
+        });
+
+        function inicializarApp() {
+            for (let i = 0; i < listaDeFrases.length; i++) {
+                let botao = document.createElement("button");
+                botao.innerText = (i + 1).toString().padStart(3, '0');
+                botao.className = "botao-numero";
+                botao.id = "btn-" + i;
+                if (progressoSalvo.includes(i)) botao.classList.add('concluido');
+                botao.addEventListener("click", () => mudarFrase(i));
+                dom.painel.appendChild(botao);
+            }
+            mudarFrase(progressoSalvo.length > 0 ? Math.min(Math.max(...progressoSalvo) + 1, listaDeFrases.length - 1) : 0);
+        }
+
+        function mudarFrase(indice) {
+            indiceAtual = indice;
+            fraseAtualEspanhol = listaDeFrases[indice].es;
+            dom.frase.innerText = fraseAtualEspanhol;
+            dom.pt.innerText = listaDeFrases[indice].pt;
+            
+            document.querySelectorAll('.botao-numero').forEach(b => b.classList.remove('ativo'));
+            const btn = document.getElementById("btn-" + indice);
+            if(btn) {
+                btn.classList.add('ativo');
+                btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            dom.resultado.innerHTML = "";
+            dom.status.innerText = "Aperte 'Falar' e repita a frase.";
+            dom.status.style.color = "var(--text-secondary)";
+
+            const imgSorteada = imagensDeFundo[Math.floor(Math.random() * imagensDeFundo.length)];
+            dom.quadro.style.backgroundImage = `url('${imgSorteada.url}')`;
+            dom.tagLocal.innerText = `📍 ${imgSorteada.nome}`;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'es-ES'; 
+            recognition.interimResults = false;
+
+            // BOTÃO DE GRAVAR MELHORADO (ANTI-TRAVAMENTO)
+            dom.btnGravar.addEventListener('click', () => {
+                initAudio(); 
+                if (isRecording) {
+                    recognition.stop();
+                    return;
+                }
+                try { recognition.start(); } catch(e) { }
+            });
+
+            recognition.onstart = () => {
+                isRecording = true;
+                dom.btnGravar.classList.add('gravando');
+                dom.lblGravar.innerText = "Ouvindo...";
+                dom.status.innerText = "🎤 Pode hablar... (Clique de novo para cancelar)";
+                dom.status.style.color = "var(--accent-blue)"; 
+                dom.resultado.innerHTML = "";
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                dom.btnGravar.classList.remove('gravando');
+                dom.lblGravar.innerText = "Falar";
+            };
+
+            recognition.onresult = (evento) => {
+                const fraseFalada = evento.results[0][0].transcript;
+                dom.status.innerText = `Você pronunciou: "${fraseFalada}"`;
+                dom.status.style.color = "var(--text-secondary)";
+                analisarPronuncia(fraseAtualEspanhol, fraseFalada);
+            };
+
+            // TRATAMENTO DE ERROS CLARO (Mostra porque não funcionou)
+            recognition.onerror = (evento) => {
+                isRecording = false;
+                dom.btnGravar.classList.remove('gravando');
+                dom.lblGravar.innerText = "Falar";
+                
+                if (evento.error === 'not-allowed'
